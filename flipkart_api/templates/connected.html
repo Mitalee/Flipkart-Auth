@@ -13,7 +13,8 @@
             function apiCall() {
                 $("#result").html('Loading...');
                 $.get("/api_data_call", function (data) {
-                    $("#result").html(data);
+                    console.log(data);
+                    $("#result").html(JSON.stringify(data));
                 })
             }
 

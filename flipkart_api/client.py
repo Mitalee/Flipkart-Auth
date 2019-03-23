@@ -166,7 +166,7 @@ class AuthClient(requests.Session):
         if token is None:
             raise ValueError('Acceess token not specified')
 
-        print('ACCESS TOKEN IN SGET DATA IS: ', token)
+        #print('ACCESS TOKEN IN SGET DATA IS: ', token)
 
         auth_header = 'Bearer {0}'.format(token)
         headers = {
@@ -175,17 +175,20 @@ class AuthClient(requests.Session):
             'Content-Type' : 'application/json;charset=utf-8'
         }
 
-        print('HEADERS ARE: ', headers)
+        #print('HEADERS ARE: ', headers)
+        
         payload = '{"filter" :{}}'
-        print('SENDING DATA')
+        #print('SENDING DATA')
 
         #url = '{0}{1}'.format(base_url, route)
         url = 'https://api.flipkart.net/sellers/orders/search'
         print('URL IS: ', url)
 
         r = requests.post(url, data=json.dumps(payload), headers=headers)
-        print("RESPONSE IS", r)
-        return r
+
+        return (r)
+
+
 
 def generate_token(length=30, allowed_chars=''.join([string.ascii_letters, string.digits])):
     """Generates random CSRF token

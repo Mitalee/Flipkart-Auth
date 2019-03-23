@@ -15,8 +15,7 @@ import json
 from .client import AuthClient
 
 api = Blueprint('flipkart_api', __name__,
-    template_folder='templates',
-    static_folder='static'
+    template_folder='templates'
 )
 
 #{access_token: "a5d0e6b8-7ebc-4bff-b3bd-f1cab88e8906", refresh_token: "65227b41-2811-4644-9003-8e3b1ffb4997"}
@@ -35,12 +34,12 @@ def flipkart_request():
 
     #print("ACCESS TOKEN IN FLIPKART REQUEST IS: ", session.get('access_token', None))
     data = auth_client.get_data()
-    #print(data)
-    #print(data.content)
-    return Response(json.loads(data.content), status=data.status_code, mimetype='application/json')
+    print(data.status_code)
+    response = json.loads(data.content)
+    print("RESPONSE IS: ", response)
+    print(type(response))
 
-
-
+    return Response(json.dumps(response), status=200, mimetype='application/json')
 
 
 
