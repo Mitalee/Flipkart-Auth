@@ -100,7 +100,7 @@ class AuthClient(requests.Session):
         }
 
         url_token = ''.join([self.token_endpoint, urlencode(body)])
-        print('URL_TOKEN IS: ', url_token)
+        #print('URL_TOKEN IS: ', url_token)
         #r = requests.get(url, auth=HTTPBasicAuth('6b378b5a2761427a06650656548123a14b56','27ba19c6d2fc10346c68f4381b704c0c2'))
         r = requests.get(url_token, auth=(app.config['APP_ID'],app.config['APP_SECRET']))
         print(r)
@@ -158,6 +158,34 @@ class AuthClient(requests.Session):
 
     #     return send_request('GET', self.user_info_url, headers, self, session=self)
 
+
+
+    def get_data(self, access_token=None):
+
+        token = access_token or self.access_token
+        if token is None:
+            raise ValueError('Acceess token not specified')
+
+        print('ACCESS TOKEN IN SGET DATA IS: ', token)
+
+        auth_header = 'Bearer {0}'.format(token)
+        headers = {
+            'Authorization': auth_header, 
+            'Accept': 'application/json',
+            'Content-Type' : 'application/json;charset=utf-8'
+        }
+
+        print('HEADERS ARE: ', headers)
+        payload = '{"filter" :{}}'
+        print('SENDING DATA')
+
+        #url = '{0}{1}'.format(base_url, route)
+        url = 'https://api.flipkart.net/sellers/orders/search'
+        print('URL IS: ', url)
+
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        print("RESPONSE IS", r)
+        return r
 
 def generate_token(length=30, allowed_chars=''.join([string.ascii_letters, string.digits])):
     """Generates random CSRF token

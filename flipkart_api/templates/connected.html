@@ -11,9 +11,9 @@
         </script>
         <script>
             function apiCall() {
-                $("#result").html('Loading...')
-                $.get("/app/qbo_request", function (data) {
-                    $("#result").html(data)
+                $("#result").html('Loading...');
+                $.get("/api_data_call", function (data) {
+                    $("#result").html(data);
                 })
             }
 

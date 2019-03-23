@@ -1,8 +1,15 @@
-from flask import render_template, redirect, session, url_for, Response, abort, request, current_app as app
+from flask import (
+	Blueprint,
+	render_template,
+	redirect,
+	session,
+	url_for,
+	Response,
+	abort,
+	request,
+	current_app as app
+	)
 
-from flask import Blueprint
-
-import settings
 import json
 
 from .client import AuthClient
@@ -12,17 +19,41 @@ api = Blueprint('flipkart_api', __name__,
     static_folder='static'
 )
 
+#{access_token: "a5d0e6b8-7ebc-4bff-b3bd-f1cab88e8906", refresh_token: "65227b41-2811-4644-9003-8e3b1ffb4997"}
+
+
+@api.route('/api_data_call/', methods=('GET', 'POST'))
+def flipkart_request():
+    auth_client = AuthClient(
+        app.config['APP_ID'],
+        app.config['APP_SECRET'],
+        app.config['REDIRECT_URI'],
+        app.config['ENVIRONMENT'],
+        access_token=session.get('access_token', None),
+        refresh_token=session.get('refresh_token', None),
+    )
+
+    #print("ACCESS TOKEN IN FLIPKART REQUEST IS: ", session.get('access_token', None))
+    data = auth_client.get_data()
+    #print(data)
+    #print(data.content)
+    return Response(json.loads(data.content), status=data.status_code, mimetype='application/json')
+
+
+
+
+
+
 @api.route('/', methods=('GET', 'POST'))
 def index():
-	#return('hi')
 	return render_template('index.html')
 
 @api.route('/oauth/', methods=('GET', 'POST'))
 def oauth():
     auth_client = AuthClient(
-        app.config['APP_ID'], 
-        app.config['APP_SECRET'], 
-        app.config['REDIRECT_URI'], 
+        app.config['APP_ID'],
+        app.config['APP_SECRET'],
+        app.config['REDIRECT_URI'],
         app.config['ENVIRONMENT']
     )
 
@@ -39,7 +70,6 @@ def oauth():
 
 @api.route('/callback', methods=('GET', 'POST'))
 def callback():
-    #print('STATE IN CALLBACK IS ', session['state'])
     
     auth_client = AuthClient(
         app.config['APP_ID'], 
@@ -48,21 +78,19 @@ def callback():
         app.config['ENVIRONMENT'],
         state_token=session.get('state', None),
     )
-    print('AUTH CLIENT STATE TOKEN IN CALLBACK IS: ', auth_client.state_token)
+    #print('AUTH CLIENT STATE TOKEN IN CALLBACK IS: ', auth_client.state_token)
     state_tok = request.args.get('state', None)
     error = request.args.get('error', None)
 
-    print('STATE TOKEN AND ERROR ARE: ', state_tok, error)
+    #print('STATE TOKEN AND ERROR ARE: ', state_tok, error)
     
     if error == 'access_denied':
         return redirect(url_for('/'))
     
     if state_tok is None:
         print('STATE TOKEN IS NONE')
-        #return HttpResponseBadRequest()
         abort(400)
     elif state_tok != auth_client.state_token:  
-        #return ('unauthorized', status=401)
         abort(401)
     
     auth_code = request.args.get('code', None)
@@ -87,14 +115,14 @@ def callback():
 
 @api.route('/connected', methods=('GET', 'POST'))
 def connected():
-    auth_client = AuthClient(
-        app.config['APP_ID'], 
-        app.config['APP_SECRET'], 
-        app.config['REDIRECT_URI'], 
-        app.config['ENVIRONMENT'],
-        access_token=session.get('access_token', None), 
-        refresh_token=session.get('refresh_token', None), 
-    )
+    # auth_client = AuthClient(
+    #     app.config['APP_ID'],
+    #     app.config['APP_SECRET'],
+    #     app.config['REDIRECT_URI'],
+    #     app.config['ENVIRONMENT'],
+    #     access_token=session.get('access_token', None),
+    #     refresh_token=session.get('refresh_token', None),
+    # )
 
     return render_template('connected.html')
 
