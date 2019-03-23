@@ -98,11 +98,20 @@ class AuthClient(requests.Session):
             'Content-Type': 'application/json;charset=utf-8'
         }
 
-        url_token = ''.join(self.token_endpoint, urlencode(body))
+        url_token = ''.join([self.token_endpoint, urlencode(body)])
         print('URL_TOKEN IS: ', url_token)
         #r = requests.get(url, auth=HTTPBasicAuth('6b378b5a2761427a06650656548123a14b56','27ba19c6d2fc10346c68f4381b704c0c2'))
         r = requests.get(url_token, auth=(app.config['APP_ID'],app.config['APP_SECRET']))
-        return (r)
+        print(r)
+        response = json.loads(r.content)
+        print(response)
+        print(type(response))
+        print('ACESS TOKEN IN GET_ACCESS TOKEN IS: ', response['access_token'])
+
+        self.access_token = response['access_token']
+        self.refresh_token = response['refresh_token']
+        self.expires_in = response['expires_in']
+        return True
 
     # def refresh(self, refresh_token=None):
     #     """Gets fresh access_token and refresh_token 
