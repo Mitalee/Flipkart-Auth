@@ -1,4 +1,4 @@
-from flask import render_template, redirect, session, url_for, Response, abort, request
+from flask import render_template, redirect, session, url_for, Response, abort, request, current_app as app
 
 from flask import Blueprint
 
@@ -20,10 +20,10 @@ def index():
 @api.route('/oauth/', methods=('GET', 'POST'))
 def oauth():
     auth_client = AuthClient(
-        settings.APP_ID, 
-        settings.APP_SECRET, 
-        settings.REDIRECT_URI, 
-        settings.ENVIRONMENT
+        app.config['APP_ID'], 
+        app.config['APP_SECRET'], 
+        app.config['REDIRECT_URI'], 
+        app.config['ENVIRONMENT']
     )
 
     print(str(auth_client))
@@ -42,10 +42,10 @@ def callback():
     #print('STATE IN CALLBACK IS ', session['state'])
     
     auth_client = AuthClient(
-        settings.APP_ID, 
-        settings.APP_SECRET, 
-        settings.REDIRECT_URI, 
-        settings.ENVIRONMENT, 
+        app.config['APP_ID'], 
+        app.config['APP_SECRET'], 
+        app.config['REDIRECT_URI'], 
+        app.config['ENVIRONMENT'],
         state_token=session.get('state', None),
     )
     print('AUTH CLIENT STATE TOKEN IN CALLBACK IS: ', auth_client.state_token)
@@ -88,10 +88,10 @@ def callback():
 @api.route('/connected', methods=('GET', 'POST'))
 def connected():
     auth_client = AuthClient(
-        settings.APP_ID, 
-        settings.APP_SECRET, 
-        settings.REDIRECT_URI, 
-        settings.ENVIRONMENT, 
+        app.config['APP_ID'], 
+        app.config['APP_SECRET'], 
+        app.config['REDIRECT_URI'], 
+        app.config['ENVIRONMENT'],
         access_token=session.get('access_token', None), 
         refresh_token=session.get('refresh_token', None), 
     )

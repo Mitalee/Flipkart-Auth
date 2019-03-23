@@ -74,6 +74,7 @@ class AuthClient(requests.Session):
 
         return ''.join([self.auth_endpoint, urlencode(url_params)])
 
+
     def get_access_token(self, auth_code):
         """Gets access_token and refresh_token using authorization code
         
@@ -104,9 +105,9 @@ class AuthClient(requests.Session):
         r = requests.get(url_token, auth=(app.config['APP_ID'],app.config['APP_SECRET']))
         print(r)
         response = json.loads(r.content)
-        print(response)
-        print(type(response))
-        print('ACESS TOKEN IN GET_ACCESS TOKEN IS: ', response['access_token'])
+        # print(response)
+        # print(type(response))
+        # print('ACESS TOKEN IN GET_ACCESS TOKEN IS: ', response['access_token'])
 
         self.access_token = response['access_token']
         self.refresh_token = response['refresh_token']
