@@ -1,0 +1,127 @@
+
+<html>
+    <head>
+        <title>OAuth2 Calls - Flipkart</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script>
+            if (window.opener) {
+                window.opener.location.href = '/app/connected'
+                window.close()
+            }
+        </script>
+        <script>
+            function apiCall() {
+                $("#result").html('Loading...')
+                $.get("/app/qbo_request", function (data) {
+                    $("#result").html(data)
+                })
+            }
+
+            function revokeCall() {
+                $("#result").html('Loading...')
+                $.get("/app/revoke", function (data) {
+                    $("#result").html(data)
+                })
+            }
+
+            function refreshCall() {
+                $("#result").html('Loading...')
+                $.get("/app/refresh", function (data) {
+                    $("#result").html(JSON.stringify(data, null, 2))
+                })
+            }
+
+            function userInfoCall() {
+                $("#result").html('Loading...')
+                $.get("/app/user_info", function (data) {
+                    $("#result").html(data)
+                })
+            }
+            function myTokens() {
+                $("#result").html('Loading...')
+                $.get("/app/mytokens", function (data) {
+                    console.log(data);
+                    console.log(typeof(data));
+                    //$("#result").html(data);
+                    $("#result").html("ACCESS TOKEN IS:" + data.access_token);
+                    $("#result").append("<br><br>REFRESH TOKEN IS:" + data.refresh_token);
+                });
+            }
+            function new_access_token() {
+                $("#result").html('Loading...');
+                $.get("/app/newAToken", function (data) {
+                    console.log(data);
+                    console.log(typeof(data));
+                    //$("#result").html(data);
+                    $("#result").html("ACCESS TOKEN IS:" + data.access_token);
+                    $("#result").append("<br><br>REFRESH TOKEN IS:" + data.refresh_token);
+                });
+            }
+            function getTaxcodes() {
+                $("#result").html('Loading...')
+                $.get("/app/getTaxcodes", function (data) {
+                    // console.log(data);
+                    // console.log(typeof(data));
+                    for (var key in data){
+                        console.log(key);
+                        $('#taxcode_select').append('<input type="radio" name="taxcode" value="'
+                                                    + data[key]
+                                                    +'"> '+key);
+                    }
+
+                })
+            }
+            function import_invoice() {
+                $("#result").html('Loading...');
+                input_data = {'customer_ref': $('#customer_ref').val(),
+                               'txn_date': $('#txn_date').val(),
+                               'item': $('#item').val(),
+                               'amount': $('#amount').val(),
+                               'taxcode': $("input[name=taxcode]:checked").val()
+                                };
+                    $.ajax({
+                        type: 'GET',
+                        url: '/app/importInvoice',
+                        data: input_data,
+                        }).done(function(response, status) {
+                             invoice = JSON.parse(response);
+                             console.log(response);
+                             console.log(invoice);
+                             $("#result").html("INVOICE NUMBER:" + invoice.Invoice.DocNumber);
+                             $("#result").append("<br>INVOICE DATE:" + invoice.Invoice.TxnDate);
+                             $("#result").append("<br>INVOICE ID:" + invoice.Invoice.Id);
+                        }).fail(function(response, status){
+                            alert('failed!');
+                        }); //end fail function
+                    }
+        </script>
+    </head>
+    <body>
+        <a href="/app/">Home</a>
+        <h3>Connected!</h3>
+        <p>Would you like to make a sample API call?</p>
+        <div>
+            {% if openid %}
+                <button onclick="userInfoCall()">UserInfo API Call</button>
+            {% else %}
+                <button onclick="apiCall()">QuickBooks API Call</button>
+            {% endif %}
+            <button onclick="refreshCall()">Refresh Token Call</button>
+            <button onclick="revokeCall()">Revoke Token Call</button>
+            <button onclick="myTokens()">My Tokens</button>
+            <button onclick="new_access_token()">Get New Access Token</button>
+            <br>
+            <button onclick="getTaxcodes()">Get TaxCodes</button>
+            <div id="taxcode_select"></div>
+            <br>
+            <br><input type=text id="customer_ref" placeholder="customer_ref"/>
+            <br><input type=text id="txn_date" placeholder="txn_date"/>
+            <br><input type=text id="item" placeholder="item"/>
+            <br><input type=text id="location" placeholder="location"/>
+            <br><input type=text id="amount" placeholder="Amount"/>
+            <br><button onclick="import_invoice()">Import Invoice</button>
+            <br>
+            <div><code id="result"></code></div>
+        </div>
+    </body>
+</html>
