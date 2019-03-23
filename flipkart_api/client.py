@@ -22,7 +22,6 @@ class AuthClient(requests.Session):
         :param state_token: CSRF token, generated if not provided, defaults to None
         :param access_token: Access Token for refresh or revoke functionality, defaults to None
         :param refresh_token: Refresh Token for refresh or revoke functionality, defaults to None
-        :param id_token: ID Token for OpenID flow, defaults to None
         """
 
         super(AuthClient, self).__init__()
@@ -38,10 +37,6 @@ class AuthClient(requests.Session):
         self.auth_endpoint = app.config['URL_AUTH']
         self.token_endpoint = app.config['URL_TOKEN']
         self.redirect_uri = app.config['REDIRECT_URI']
-
-        # self.redirect_uri= "http://localhost:8001"
-        # self.auth_endpoint = 'https://api.flipkart.net/oauth-service/oauth/authorize'
-        # self.token_endpoint = 'https://api.flipkart.net/oauth-service/oauth/token?'
 
         # response values
         self.access_token = access_token
@@ -80,84 +75,27 @@ class AuthClient(requests.Session):
         
         :param auth_code: Authorization code received from redirect_uri
         """
-        # headers = {
-        #     'Content-Type': 'application/x-www-form-urlencoded',
-        #     'Authorization': get_auth_header(self.app_id, self.app_secret)
-        # }
-
         body = {
             'grant_type': 'authorization_code',
             'code': auth_code,
             'redirect_uri': self.redirect_uri
         }
 
-        # send_request('POST', self.token_endpoint, headers, self, body=urlencode(body), session=self)   
-
         headers = {
-          #'Authorization': '11a408bb3b648b6a2a62191028a2858a18997:734c4c025c6b163dd5ae7c021c9459d6', 
             'Accept': 'application/json', 
             'Content-Type': 'application/json;charset=utf-8'
         }
 
         url_token = ''.join([self.token_endpoint, urlencode(body)])
-        #print('URL_TOKEN IS: ', url_token)
-        #r = requests.get(url, auth=HTTPBasicAuth('6b378b5a2761427a06650656548123a14b56','27ba19c6d2fc10346c68f4381b704c0c2'))
+
         r = requests.get(url_token, auth=(app.config['APP_ID'],app.config['APP_SECRET']))
         print(r)
         response = json.loads(r.content)
-        # print(response)
-        # print(type(response))
-        # print('ACESS TOKEN IN GET_ACCESS TOKEN IS: ', response['access_token'])
 
         self.access_token = response['access_token']
         self.refresh_token = response['refresh_token']
         self.expires_in = response['expires_in']
         return True
-
-    # def refresh(self, refresh_token=None):
-    #     """Gets fresh access_token and refresh_token 
-        
-    #     :param refresh_token: Refresh Token
-    #     :raises ValueError: if Refresh Token value not specified
-    #     :raises `intuitlib.exceptions.AuthappError`: if response status != 200
-    #     """
-
-    #     token = refresh_token or self.refresh_token
-    #     if token is None:
-    #         raise ValueError('Refresh token not specified')
-
-    #     headers = {
-    #         'Content-Type': 'application/x-www-form-urlencoded',
-    #         'Authorization': get_auth_header(self.app_id, self.app_secret)
-    #     }
-
-    #     body = {
-    #         'grant_type': 'refresh_token',
-    #         'refresh_token': token
-    #     }
-
-    #     send_request('POST', self.token_endpoint, headers, self, body=urlencode(body), session=self)
-
-            
-    # def get_user_info(self, access_token=None):
-    #     """Gets User Info based on OpenID scopes specified
-        
-    #     :param access_token: Access token
-    #     :raises ValueError: if Refresh Token or Access Token value not specified
-    #     :raises `intuitlib.exceptions.AuthappError`: if response status != 200
-    #     :return: Requests object
-    #     """
-
-    #     token = access_token or self.access_token
-    #     if token is None:
-    #         raise ValueError('Acceess token not specified')
-
-    #     headers = {
-    #         'Authorization': 'Bearer {0}'.format(token)
-    #     }
-
-    #     return send_request('GET', self.user_info_url, headers, self, session=self)
-
 
 
     def get_data(self, access_token=None):
@@ -166,7 +104,6 @@ class AuthClient(requests.Session):
         if token is None:
             raise ValueError('Acceess token not specified')
 
-        #print('ACCESS TOKEN IN SGET DATA IS: ', token)
 
         auth_header = 'Bearer {0}'.format(token)
         headers = {
@@ -175,10 +112,9 @@ class AuthClient(requests.Session):
             'Content-Type' : 'application/json;charset=utf-8'
         }
 
-        #print('HEADERS ARE: ', headers)
         
         payload = '{"filter" :{}}'
-        #print('SENDING DATA')
+
 
         #url = '{0}{1}'.format(base_url, route)
         url = 'https://api.flipkart.net/sellers/orders/search'
