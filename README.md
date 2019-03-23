@@ -14,7 +14,7 @@
   Add the Redirect URL as:
   <ngrok_url>+'/callback'
 
-4. Add this redirect URL to settings.py file, along with the Application ID and Application Secret.
+4. Add this redirect URL to settings.py file (rename 'settings_example.py' to 'settings.py'), along with the Application ID and Application Secret.
 
 5. Run the app
 ```
